@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warehouse Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand"><span>WH</span><div><b>Warehouse</b><small>Management System</small></div></div>
+      <nav>
+        <button class="nav-btn active" data-section="dashboard">▦ <span>Dashboard</span></button>
+        <button class="nav-btn" data-section="inventory">▣ <span>Inventory</span></button>
+        <button class="nav-btn" data-section="orders">☷ <span>Orders</span></button>
+        <button class="nav-btn" data-section="stock">↕ <span>Stock Movement</span></button>
+      </nav>
+      <div class="sidebar-foot">HTML • CSS • JavaScript<br>Local Storage Enabled</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h1 id="pageTitle">Dashboard</h1>
+          <p>Track inventory, stock and order fulfillment.</p>
+        </div>
+        <button class="primary" id="quickAdd">+ Add Product</button>
+      </header>
+
+      <section id="dashboard" class="section active">
+        <div class="cards">
+          <div class="card"><div class="icon blue">▣</div><div><span>Total Products</span><strong id="totalProducts">0</strong></div></div>
+          <div class="card"><div class="icon green">📦</div><div><span>Total Units</span><strong id="totalUnits">0</strong></div></div>
+          <div class="card"><div class="icon orange">⚠</div><div><span>Low Stock</span><strong id="lowStock">0</strong></div></div>
+          <div class="card"><div class="icon purple">$</div><div><span>Inventory Value</span><strong id="inventoryValue">$0</strong></div></div>
+        </div>
+
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-head"><h2>Recent Orders</h2><button class="text-btn" data-go="orders">View all</button></div>
+            <div id="recentOrders" class="table-wrap"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h2>Low Stock Alerts</h2><button class="text-btn" data-go="inventory">Inventory</button></div>
+            <div id="lowStockList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="inventory" class="section">
+        <div class="toolbar">
+          <div class="search"><span>⌕</span><input id="inventorySearch" placeholder="Search product, SKU or category..."></div>
+          <select id="categoryFilter"><option value="all">All Categories</option></select>
+          <button class="primary" id="addProduct">+ Add Product</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Inventory</h2><span id="inventoryCount" class="muted"></span></div>
+          <div class="table-wrap"><table><thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Location</th><th>Stock</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead><tbody id="inventoryTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="orders" class="section">
+        <div class="toolbar">
+          <div class="search"><span>⌕</span><input id="orderSearch" placeholder="Search order or customer..."></div>
+          <select id="orderStatusFilter"><option value="all">All Statuses</option><option>Pending</option><option>Processing</option><option>Shipped</option><option>Delivered</option><option>Cancelled</option></select>
+          <button class="primary" id="addOrder">+ New Order</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>Order Fulfillment</h2><span class="muted">Manage customer orders</span></div>
+          <div class="table-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead><tbody id="ordersTable"></tbody></table></div>
+        </div>
+      </section>
+
+      <section id="stock" class="section">
+        <div class="panel">
+          <div class="panel-head"><h2>Stock Movement</h2><button class="primary" id="newMovement">+ Record Movement</button></div>
+          <div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Product</th><th>SKU</th><th>Quantity</th><th>Reason</th></tr></thead><tbody id="movementTable"></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="productModal">
+    <div class="modal-box">
+      <div class="modal-head"><h2 id="productModalTitle">Add Product</h2><button class="close">×</button></div>
+      <form id="productForm">
+        <input type="hidden" id="productId">
+        <div class="form-grid">
+          <label>Product Name<input id="pName" required></label>
+          <label>SKU<input id="pSku" required></label>
+          <label>Category<input id="pCategory" required></label>
+          <label>Location<input id="pLocation" placeholder="A-01" required></label>
+          <label>Quantity<input id="pQuantity" type="number" min="0" required></label>
+          <label>Reorder Level<input id="pReorder" type="number" min="0" value="10" required></label>
+          <label>Unit Price ($)<input id="pPrice" type="number" min="0" step="0.01" required></label>
+        </div>
+        <div class="modal-actions"><button type="button" class="secondary close">Cancel</button><button class="primary">Save Product</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="orderModal">
+    <div class="modal-box">
+      <div class="modal-head"><h2>New Order</h2><button class="close">×</button></div>
+      <form id="orderForm">
+        <label>Customer Name<input id="oCustomer" required></label>
+        <label>Product<select id="oProduct" required></select></label>
+        <label>Quantity<input id="oQuantity" type="number" min="1" value="1" required></label>
+        <div class="modal-actions"><button type="button" class="secondary close">Cancel</button><button class="primary">Create Order</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="movementModal">
+    <div class="modal-box">
+      <div class="modal-head"><h2>Record Stock Movement</h2><button class="close">×</button></div>
+      <form id="movementForm">
+        <label>Product<select id="mProduct" required></select></label>
+        <label>Movement Type<select id="mType"><option value="IN">Stock In</option><option value="OUT">Stock Out</option></select></label>
+        <label>Quantity<input id="mQuantity" type="number" min="1" required></label>
+        <label>Reason<input id="mReason" placeholder="Purchase, damaged, dispatch..." required></label>
+        <div class="modal-actions"><button type="button" class="secondary close">Cancel</button><button class="primary">Save Movement</button></div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+  <script src="script.js"></script>
+</body>
+</html>
